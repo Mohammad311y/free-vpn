@@ -1,0 +1,49 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.24.5'
+
+      - name: Generate Android project
+        run: |
+          if [ ! -d android ]; then
+            flutter create --org com.freevpn --project-name freevpn --platforms=android .
+          fi
+          rm -f test/widget_test.dart
+          python3 tool/patch_android.py
+
+      - run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release --split-per-abi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FreeVPN-apk
+          path: build/app/outputs/flutter-apk/*-release.apk
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: FreeVPN v1.0.${{ github.run_number }}
+          files: build/app/outputs/flutter-apk/*-release.apk

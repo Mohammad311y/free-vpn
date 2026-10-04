@@ -1,0 +1,19 @@
+name: freevpn
+description: Free V2Ray/Xray VPN client with servers collected from Telegram & the web.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_v2ray: ^1.0.10      # Xray core (vless/vmess/trojan/ss) + Android VpnService
+  http: ^1.2.1
+  shared_preferences: ^2.2.3
+  flutter_animate: ^4.5.0
+  dynamic_color: ^1.7.0       # Material You colors from the wallpaper
+
+flutter:
+  uses-material-design: true
